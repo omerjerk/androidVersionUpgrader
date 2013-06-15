@@ -32,6 +32,7 @@ public class MainActivity extends Activity {
 			
 			// Attempt to write a file to a root-only
 			DataOutputStream os = new DataOutputStream(p.getOutputStream());
+			os.writeBytes("mount -o rw,remount -t yaffs2 /dev/block/mtdblock0 /system\n");
 			os.writeBytes("echo \"Do I have root?\" >/system/etc/temporary.txt\n");
 			
 			// Close the terminal
