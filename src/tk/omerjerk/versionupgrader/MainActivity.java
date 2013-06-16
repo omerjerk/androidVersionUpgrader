@@ -1,13 +1,19 @@
 package tk.omerjerk.versionupgrader;
 
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Properties;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +71,10 @@ public class MainActivity extends Activity {
 		}
 		
 		protected void onPostExecute(Boolean b){
+			ProgressBar pBar = (ProgressBar) findViewById(R.id.progressBar);
+			TextView checkingRoot = (TextView) findViewById(R.id.checkingRoot);
+			pBar.setVisibility(View.GONE);
+			checkingRoot.setVisibility(View.GONE);
 			if(b){
 				showToast("ROOTED !");
 				//Do rest of work
@@ -72,12 +82,55 @@ public class MainActivity extends Activity {
 				showToast("No Root!");
 				TextView noRoot = (TextView) findViewById(R.id.noRoot);
 				noRoot.setVisibility(View.VISIBLE);
+				
 			}
 		}
 	}
 	
 	private void showToast(String s){
 		Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+	}
+	
+	public void backupBuildProp(View v){
+		try{
+			// Preform su to get root privledges
+			Process p = Runtime.getRuntime().exec("su");
+						
+			// Attempt to write a file to a root-only
+			DataOutputStream os = new DataOutputStream(p.getOutputStream());
+			// Remounting /system as read+write
+			os.writeBytes("mount -o rw,remount -t yaffs2 /dev/block/mtdblock0 /system\n");
+			// Copying file to SD Card
+			os.writeBytes("cp -f /system/build.prop " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.bak\n");
+			os.writeBytes("exit\n");
+			os.flush();
+			p.waitFor();
+			
+		} catch (Exception e){
+			showToast("Unable to get root access. Please restart the app.");
+		}
+		
+	}
+	
+	public void getValue(View v){
+		final Properties properties = new Properties();
+		File tempBuildProp = new File(Environment.getExternalStorageDirectory().getPath() + "/build.prop.bak");
+		
+		try{
+			properties.load(new FileInputStream(tempBuildProp));
+		} catch (IOException e){
+			showToast("Error Occured: " + e);
+		}
+		
+		final String[] pTitle = properties.keySet().toArray(new String[0]);
+    	final ArrayList<String> pDesc = new ArrayList<String>();
+    	for (int i = 0; i < pTitle.length; i++) {
+    		pDesc.add(properties.getProperty(pTitle[i]));
+    	}
+    	
+    	for (int i=0; i <pTitle.length; i++){
+    		System.out.println("Property : " + pTitle[i] + "  Value : " + pDesc.get(i));
+    	}
 	}
 
 }
