@@ -4,9 +4,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -15,6 +17,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		new rootCheckAsyncTask().execute();
 	}
 
 	@Override
@@ -24,7 +27,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void update(View v){
+	private boolean checkRoot(){
 		Process p;
 		try{
 			// Preform su to get root privledges
@@ -42,20 +45,39 @@ public class MainActivity extends Activity {
 			try{
 				p.waitFor();
 				if(p.exitValue() != 225){
-					showToast("ROOTED !");
+					return true;
 				} else {
-					showToast("not root");
+					return false;
 				}
 			} catch(InterruptedException e){
-				showToast("not root");
+				return false;
 			}
 		} catch(IOException e){
-			showToast("not root");
+			return false;
+		}
+	}
+	
+	// Dirty hack for now in AsyncTask
+	public class rootCheckAsyncTask extends AsyncTask <Void, Void, Boolean> {
+		protected Boolean doInBackground(Void... voids ){
+			boolean result = checkRoot();
+			return result;
+		}
+		
+		protected void onPostExecute(Boolean b){
+			if(b){
+				showToast("ROOTED !");
+				//Do rest of work
+			} else {
+				showToast("No Root!");
+				TextView noRoot = (TextView) findViewById(R.id.noRoot);
+				noRoot.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 	
 	private void showToast(String s){
-		Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+		Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
 	}
 
 }

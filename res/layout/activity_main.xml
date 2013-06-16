@@ -6,16 +6,18 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity"
+    android:background="@drawable/stitch" >
 
-    <Button
-        android:id="@+id/button1"
+    <TextView
+        android:id="@+id/noRoot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="112dp"
-        android:text="Root Check"
-        android:onClick="update" />
+        android:layout_centerVertical="true"
+        android:text="Your phone ain&apos;t rooted. Uninstall this app as fast as you can!!"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/red"
+        android:visibility="gone" />
 
 </RelativeLayout>
