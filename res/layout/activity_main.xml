@@ -1,9 +1,19 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/stitch"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/stitch"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+    
+    <LinearLayout android:id="@+id/adLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    
+<ScrollView 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
 <RelativeLayout
     android:layout_width="match_parent"
@@ -12,7 +22,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
-
+    
     <TextView
         android:id="@+id/noRoot"
         android:layout_width="wrap_content"
@@ -23,22 +33,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/red"
         android:visibility="gone" />
-
     
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-    </RelativeLayout>
-
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true" />
     
     <TextView
@@ -52,40 +53,64 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/red" />
     
-    <Button
-        android:id="@+id/button0"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/mainContent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/checkingRoot"
-        android:text="backup "
-        android:onClick="backupBuildProp" />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="getValue"
-        android:layout_below="@id/button0"
-        android:text="Get Value" />
+        android:orientation="vertical"
+        android:visibility="gone" >
+        
+        <TextView 
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/header"
+            android:textColor="@color/red"
+            android:textSize="23sp" />
+        
+        <TextView
+            android:id="@+id/versionHeader" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Android Version :"
+            android:textColor="@color/red"
+            android:layout_marginTop="25dp"
+            android:textSize="17sp" />
+        
+        <EditText 
+            android:id="@+id/versionEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/lightRed" />
+        
+        <TextView
+            android:id="@+id/modelHeader" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Model Name :"
+            android:textColor="@color/red"
+            android:layout_marginTop="22dp"
+            android:textSize="17sp" />
+        
+        <EditText 
+            android:id="@+id/modelEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/lightRed" />
+        
+        <Button 
+            android:id="@+id/commit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="55dp"
+            android:text="Commit the changes !"
+            android:onClick="commit" />
+        
+    </LinearLayout>
     
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="editValue"
-        android:layout_below="@id/button1"
-        android:text="editValue" />
-    
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="copyToSystem"
-        android:layout_below="@id/button2"
-        android:text="Copy To System" />
-
 </RelativeLayout>
-
-    
     
 </ScrollView>
+</LinearLayout>

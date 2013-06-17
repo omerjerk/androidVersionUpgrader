@@ -1,3 +1,4 @@
 <resources>
-    <color name="red">#B24700</color>    
+    <color name="red">#B24700</color>
+    <color name="lightRed">#FFF</color>    
 </resources>

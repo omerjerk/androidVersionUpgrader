@@ -4,5 +4,6 @@
     <string name="app_name">Version Upgrader</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="header"><b>Change the below settings as you want and make your friends fool.</b></string>
 
 </resources>
