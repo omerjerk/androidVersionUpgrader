@@ -80,6 +80,9 @@ public class MainActivity extends FragmentActivity {
 	            DialogFragment aboutD = new aboutDialog();
 	            aboutD.show(getSupportFragmentManager(), "ABOUT_DIALOG");
 	            return true;
+	        case R.id.settings_restore:
+	        	restore();
+	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -171,7 +174,7 @@ public class MainActivity extends FragmentActivity {
 		
 		backupBuildProp();
 		final Properties properties = new Properties();
-		tempBuildProp = new File(Environment.getExternalStorageDirectory().getPath() + "/build.prop.temp");
+		tempBuildProp = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.temp");
 		
 		try{
 			properties.load(new FileInputStream(tempBuildProp));
@@ -232,7 +235,7 @@ public class MainActivity extends FragmentActivity {
         try {
             process = Runtime.getRuntime().exec("su");
 	        os = new DataOutputStream(process.getOutputStream());
-	        os.writeBytes("mount -o remount,rw -t yaffs2 /dev/block/mtdblock4 /system\n");
+	        os.writeBytes("mount -o remount,rw -t yaffs2 /dev/block/mtdblock0 /system\n");
 	        os.writeBytes("mv -f /system/build.prop /system/build.prop.bak\n");
 	        os.writeBytes("busybox cp -f " + tempBuildProp + " /system/build.prop\n");
 	        os.writeBytes("chmod 755 /system/build.prop\n");
@@ -255,5 +258,22 @@ public class MainActivity extends FragmentActivity {
             }
         }
 	}
-
+	
+	private void restore(){
+		Process process;
+		DataOutputStream os;
+		try {
+			process = Runtime.getRuntime().exec("su");
+			os = new DataOutputStream(process.getOutputStream());
+			os.writeBytes("mount -o remount,rw -t yaffs2 /dev/block/mtdblock0 /system\n");
+			os.writeBytes("busybox cp -f " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.bak" + " /system/build.prop\n");
+			os.writeBytes("chmod 755 /system/build.prop\n");
+			os.writeBytes("exit\n");
+			os.flush();
+			process.waitFor();
+			showToast("Original build.prop restored !");
+		} catch(Exception e){
+			showToast("Error : " + e);
+		}	
+	}
 }
