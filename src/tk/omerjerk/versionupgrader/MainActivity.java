@@ -30,16 +30,19 @@ public class MainActivity extends FragmentActivity {
 	
 	String versionValue;
 	File tempBuildProp;
-	EditText versionEditor, modelEditor;
+	EditText versionEditor, modelEditor, buildEditor;
 	private AdView adView;
     private static final String MY_AD_UNIT_ID = "a151bf1a0035e57";
+	boolean fix = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		versionEditor = (EditText) findViewById(R.id.versionEditor);
+		modelEditor = (EditText) findViewById(R.id.modelEditor);
+		buildEditor = (EditText) findViewById(R.id.buildEditor);
 		if(savedInstanceState == null){
-			
 			new rootCheckAsyncTask().execute();
 		} else {
 			ProgressBar pBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -187,17 +190,22 @@ public class MainActivity extends FragmentActivity {
     	for (int i = 0; i < pTitle.length; i++) {
     		pDesc.add(properties.getProperty(pTitle[i]));
     	}
-    	
     	for (int i=0; i <pTitle.length; i++){
     		//System.out.println("Property : " + pTitle[i] + "  Value : " + pDesc.get(i));
     		if (pTitle[i].equals("ro.build.version.release")){
-    			versionEditor = (EditText) findViewById(R.id.versionEditor);
     			versionEditor.setText(pDesc.get(i));
     		}
     		if (pTitle[i].equals("ro.product.model")){
-    			modelEditor = (EditText) findViewById(R.id.modelEditor);
     			modelEditor.setText(pDesc.get(i));
     		}
+    		if (pTitle[i].equals("ro.build.display.id")){
+    			buildEditor.setText(pDesc.get(i));
+    			fix = true;
+    		}
+    	}
+    	if (fix == false){
+    		buildEditor.setText("This field is not supported in your ROM.");
+    		buildEditor.setKeyListener(null);
     	}
 	}
 	
@@ -215,6 +223,9 @@ public class MainActivity extends FragmentActivity {
 		
 		properties.setProperty("ro.build.version.release", versionEditor.getText().toString());
 		properties.setProperty("ro.product.model", modelEditor.getText().toString());
+		if (fix == true){
+			properties.setProperty("ro.build.display.id", buildEditor.getText().toString());
+		}
 		
 		try {
 			FileOutputStream changedOutput = new FileOutputStream(tempBuildProp);

@@ -100,6 +100,22 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/lightRed" />
         
+        <TextView
+            android:id="@+id/buildHeader" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Build Number :"
+            android:textColor="@color/red"
+            android:layout_marginTop="22dp"
+            android:textSize="17sp" />
+        
+        <EditText 
+            android:id="@+id/buildEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/lightRed" />
+        
         <Button 
             android:id="@+id/commit"
             android:layout_width="match_parent"
