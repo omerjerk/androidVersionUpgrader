@@ -21,7 +21,7 @@ public class SplashScreen extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		clicked = false;
-		setContentView(R.layout.activity_splash_screen);
+		setContentView(R.layout.splash_screen);
 		
 		// Create the adView
 	    adView = new AdView(SplashScreen.this, AdSize.BANNER, MY_AD_UNIT_ID);

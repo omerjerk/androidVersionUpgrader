@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/stitch"
+    android:background="@drawable/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
@@ -8,8 +8,17 @@
     
     <LinearLayout android:id="@+id/adLayout"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" />
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@color/lightRed" />
+    
+    <Button 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Partner Apps"
+        android:layout_gravity="center"
+        android:onClick="partenerApps"
+        android:background="@drawable/button" />
     
 <ScrollView 
     android:layout_width="match_parent"
@@ -116,11 +125,28 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/lightRed" />
         
+        <TextView
+            android:id="@+id/buildDateHeader" 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Build Date :"
+            android:textColor="@color/red"
+            android:layout_marginTop="22dp"
+            android:textSize="17sp" />
+        
+        <EditText 
+            android:id="@+id/buildDateEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/lightRed" />
+        
         <Button 
             android:id="@+id/commit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="55dp"
+            android:background="@drawable/button"
             android:text="Commit the changes !"
             android:onClick="commit" />
         

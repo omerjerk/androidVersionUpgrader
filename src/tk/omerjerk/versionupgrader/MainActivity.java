@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,15 +28,17 @@ import android.widget.Toast;
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
+import com.purplebrain.adbuddiz.sdk.AdBuddiz;
 
 public class MainActivity extends FragmentActivity {
 	
 	String versionValue;
 	File tempBuildProp;
-	EditText versionEditor, modelEditor, buildEditor;
+	EditText versionEditor, modelEditor, buildEditor, buildDateEditor;
 	private AdView adView;
     private static final String MY_AD_UNIT_ID = "a151bf1a0035e57";
-	boolean fix = false;
+	boolean fix1,fix2, clicked = false;
+	TextView noRootText;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,12 @@ public class MainActivity extends FragmentActivity {
 		versionEditor = (EditText) findViewById(R.id.versionEditor);
 		modelEditor = (EditText) findViewById(R.id.modelEditor);
 		buildEditor = (EditText) findViewById(R.id.buildEditor);
+		buildDateEditor = (EditText) findViewById(R.id.buildDateEditor);
+		TextView header = (TextView) findViewById(R.id.header);
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Chantelli_Antiqua.ttf");  
+        header.setTypeface(font);
+        noRootText = (TextView) findViewById(R.id.noRoot);
+        noRootText.setTypeface(font);
 		if(savedInstanceState == null){
 			new rootCheckAsyncTask().execute();
 		} else {
@@ -65,7 +76,15 @@ public class MainActivity extends FragmentActivity {
 	    layout.addView(adView);
 
 	    // Initiate a generic request to load it with an ad
-	    adView.loadAd(new AdRequest());		
+	    		
+	    
+		layout.setOnClickListener(new LinearLayout.OnClickListener(){
+			public void onClick (View v){
+			clicked = true;
+			}
+		});
+		
+		
 	}
 
 	@Override
@@ -142,8 +161,12 @@ public class MainActivity extends FragmentActivity {
 				showToast("No Root!");
 				TextView noRoot = (TextView) findViewById(R.id.noRoot);
 				noRoot.setVisibility(View.VISIBLE);
-				
+								
 			}
+			
+			adView.loadAd(new AdRequest());
+			
+			AdBuddiz.getInstance().cacheAds(MainActivity.this);
 		}
 	}
 	
@@ -200,41 +223,56 @@ public class MainActivity extends FragmentActivity {
     		}
     		if (pTitle[i].equals("ro.build.display.id")){
     			buildEditor.setText(pDesc.get(i));
-    			fix = true;
+    			fix1 = true;
+    		}
+    		if (pTitle[i].equals("ro.build.date")){
+    			buildDateEditor.setText(pDesc.get(i));
+    			fix2 = true;
     		}
     	}
-    	if (fix == false){
+    	if (fix1 == false){
     		buildEditor.setText("This field is not supported in your ROM.");
     		buildEditor.setKeyListener(null);
+    	}
+    	if (fix2 == false){
+    		buildDateEditor.setText("This field is not supported in your ROM.");
+    		buildDateEditor.setKeyListener(null);
     	}
 	}
 	
 	public void commit(View v){
 		
-		final Properties properties = new Properties();
-		try{
+		if(clicked == true){
+			final Properties properties = new Properties();
+			try{
+				
+				FileInputStream in = new FileInputStream(tempBuildProp);
+				properties.load(in);
+				in.close();
+			} catch (IOException e){
+				showToast("Error : " + e);
+			}
 			
-			FileInputStream in = new FileInputStream(tempBuildProp);
-			properties.load(in);
-			in.close();
-		} catch (IOException e){
-			showToast("Error : " + e);
-		}
-		
-		properties.setProperty("ro.build.version.release", versionEditor.getText().toString());
-		properties.setProperty("ro.product.model", modelEditor.getText().toString());
-		if (fix == true){
-			properties.setProperty("ro.build.display.id", buildEditor.getText().toString());
-		}
-		
-		try {
-			FileOutputStream changedOutput = new FileOutputStream(tempBuildProp);
-			properties.store(changedOutput, null);
-			changedOutput.close();
+			properties.setProperty("ro.build.version.release", versionEditor.getText().toString());
+			properties.setProperty("ro.product.model", modelEditor.getText().toString());
+			if (fix1 == true){
+				properties.setProperty("ro.build.display.id", buildEditor.getText().toString());
+			}
+			if (fix2 == true){
+				properties.setProperty("ro.build.date", buildDateEditor.getText().toString());
+			}
 			
-			copyToSystem();
-		} catch(IOException e){
-			showToast("Error : " + e);
+			try {
+				FileOutputStream changedOutput = new FileOutputStream(tempBuildProp);
+				properties.store(changedOutput, null);
+				changedOutput.close();
+				
+				copyToSystem();
+			} catch(IOException e){
+				showToast("Error : " + e);
+			}
+		} else {
+			Toast.makeText(getApplicationContext(), "Please click on the ad to continue!", Toast.LENGTH_LONG).show();
 		}
 		
 	}
@@ -254,8 +292,8 @@ public class MainActivity extends FragmentActivity {
 	        os.flush();
 	        process.waitFor();
 	        
-	        Toast.makeText(getApplicationContext(), "Please restart the phone to observe the changes!", Toast.LENGTH_LONG).show();
-	        Toast.makeText(getApplicationContext(), "Please click on the above ad to support me so that I could continue my schooling ! :)", Toast.LENGTH_LONG).show();
+	        Toast.makeText(getApplicationContext(), "Your changes have been comitted. Please restart the phone to observe the changes!", Toast.LENGTH_LONG).show();
+	       // Toast.makeText(getApplicationContext(), "Please click on the above ad to support me so that I could continue my schooling ! :)", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
@@ -287,4 +325,35 @@ public class MainActivity extends FragmentActivity {
 			showToast("Error : " + e);
 		}	
 	}
+	
+	public void partenerApps(View v){
+		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.omerjerk.cheatbox"));
+ 	    startActivity(browserIntent);
+	}
+	
+	@Override
+	public void onStart(){
+		super.onStart();
+		AdBuddiz.getInstance().onStart(this);
+	}
+	
+	@Override
+	public void onBackPressed(){
+		AdBuddiz.getInstance().showAd();
+		super.onBackPressed();
+	}
+	
+	@Override
+    public void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        clicked = true;
+    }
 }
