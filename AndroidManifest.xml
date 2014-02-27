@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tk.omerjerk.versionupgrader"
-    android:versionCode="12"
-    android:versionName="0.9.4" >
+    android:versionCode="17"
+    android:versionName="1.0.6" >
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
 
     <application
         android:allowBackup="true"
@@ -22,27 +18,13 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="tk.omerjerk.versionupgrader.MainActivity"
-            android:label="@string/app_name" />
-        <activity
-            android:name="tk.omerjerk.versionupgrader.SplashScreen"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
         </activity>
-        <!-- AdMobActivity definition -->
-        <activity
-            android:name="com.google.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-        
-        <activity android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity" 
-               android:theme="@android:style/Theme.Translucent" />
-        
-        <meta-data android:name="ADBUDDIZ_PUBLISHER_KEY" android:value="e53ed861-0a7f-42ad-b176-0401e3d48418" />
-        
     </application>
 
 </manifest>

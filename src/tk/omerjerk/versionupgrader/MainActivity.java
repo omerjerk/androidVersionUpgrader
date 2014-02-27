@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,19 +23,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-import com.purplebrain.adbuddiz.sdk.AdBuddiz;
-
 public class MainActivity extends FragmentActivity {
 	
 	String versionValue;
 	File tempBuildProp;
 	EditText versionEditor, modelEditor, buildEditor, buildDateEditor;
-	private AdView adView;
-    private static final String MY_AD_UNIT_ID = "a151bf1a0035e57";
-	boolean fix1,fix2, clicked = false;
+	boolean fix1,fix2;
 	TextView noRootText;
 	
 	@Override
@@ -63,28 +54,7 @@ public class MainActivity extends FragmentActivity {
 			LinearLayout mainContent = (LinearLayout) findViewById(R.id.mainContent);
 			mainContent.setVisibility(View.VISIBLE);
 			fillValues();
-		}
-		
-		// Create the adView
-	    adView = new AdView(MainActivity.this, AdSize.BANNER, MY_AD_UNIT_ID);
-
-	    // Lookup your LinearLayout assuming it's been given
-	    // the attribute android:id="@+id/mainLayout"
-	    LinearLayout layout = (LinearLayout) findViewById(R.id.adLayout);
-
-	    // Add the adView to it
-	    layout.addView(adView);
-
-	    // Initiate a generic request to load it with an ad
-	    		
-	    
-		layout.setOnClickListener(new LinearLayout.OnClickListener(){
-			public void onClick (View v){
-			clicked = true;
-			}
-		});
-		
-		
+		}		
 	}
 
 	@Override
@@ -110,7 +80,7 @@ public class MainActivity extends FragmentActivity {
 	    }
 	}
 	
-	private boolean checkRoot(){
+	private static boolean checkRoot(){
 		Process p;
 		try{
 			// Preform su to get root privledges
@@ -118,7 +88,7 @@ public class MainActivity extends FragmentActivity {
 			
 			// Attempt to write a file to a root-only
 			DataOutputStream os = new DataOutputStream(p.getOutputStream());
-			os.writeBytes("mount -o rw,remount -t yaffs2 /dev/block/mtdblock0 /system\n");
+			os.writeBytes("mount -o rw,remount /system\n");
 			os.writeBytes("echo \"Do I have root?\" >/system/etc/temporary.txt\n");
 			
 			// Close the terminal
@@ -163,10 +133,6 @@ public class MainActivity extends FragmentActivity {
 				noRoot.setVisibility(View.VISIBLE);
 								
 			}
-			
-			adView.loadAd(new AdRequest());
-			
-			AdBuddiz.getInstance().cacheAds(MainActivity.this);
 		}
 	}
 	
@@ -182,7 +148,7 @@ public class MainActivity extends FragmentActivity {
 			// Attempt to write a file to a root-only
 			DataOutputStream os = new DataOutputStream(p.getOutputStream());
 			// Remounting /system as read+write
-			os.writeBytes("mount -o rw,remount -t yaffs2 /dev/block/mtdblock0 /system\n");
+			os.writeBytes("mount -o rw,remount /system\n");
 			// Copying file to SD Card
 			os.writeBytes("cp -f /system/build.prop " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.bak\n");
 			os.writeBytes("cp -f /system/build.prop " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.temp\n");
@@ -242,37 +208,33 @@ public class MainActivity extends FragmentActivity {
 	
 	public void commit(View v){
 		
-		if(clicked == true){
-			final Properties properties = new Properties();
-			try{
-				
-				FileInputStream in = new FileInputStream(tempBuildProp);
-				properties.load(in);
-				in.close();
-			} catch (IOException e){
-				showToast("Error : " + e);
-			}
+		final Properties properties = new Properties();
+		try{
 			
-			properties.setProperty("ro.build.version.release", versionEditor.getText().toString());
-			properties.setProperty("ro.product.model", modelEditor.getText().toString());
-			if (fix1 == true){
-				properties.setProperty("ro.build.display.id", buildEditor.getText().toString());
-			}
-			if (fix2 == true){
-				properties.setProperty("ro.build.date", buildDateEditor.getText().toString());
-			}
+			FileInputStream in = new FileInputStream(tempBuildProp);
+			properties.load(in);
+			in.close();
+		} catch (IOException e){
+			showToast("Error : " + e);
+		}
+		
+		properties.setProperty("ro.build.version.release", versionEditor.getText().toString());
+		properties.setProperty("ro.product.model", modelEditor.getText().toString());
+		if (fix1 == true){
+			properties.setProperty("ro.build.display.id", buildEditor.getText().toString());
+		}
+		if (fix2 == true){
+			properties.setProperty("ro.build.date", buildDateEditor.getText().toString());
+		}
+		
+		try {
+			FileOutputStream changedOutput = new FileOutputStream(tempBuildProp);
+			properties.store(changedOutput, null);
+			changedOutput.close();
 			
-			try {
-				FileOutputStream changedOutput = new FileOutputStream(tempBuildProp);
-				properties.store(changedOutput, null);
-				changedOutput.close();
-				
-				copyToSystem();
-			} catch(IOException e){
-				showToast("Error : " + e);
-			}
-		} else {
-			Toast.makeText(getApplicationContext(), "Please click on the ad to continue!", Toast.LENGTH_LONG).show();
+			copyToSystem();
+		} catch(IOException e){
+			showToast("Error : " + e);
 		}
 		
 	}
@@ -284,7 +246,7 @@ public class MainActivity extends FragmentActivity {
         try {
             process = Runtime.getRuntime().exec("su");
 	        os = new DataOutputStream(process.getOutputStream());
-	        os.writeBytes("mount -o remount,rw -t yaffs2 /dev/block/mtdblock0 /system\n");
+	        os.writeBytes("mount -o rw,remount /system\n");
 	        os.writeBytes("mv -f /system/build.prop /system/build.prop.bak\n");
 	        os.writeBytes("busybox cp -f " + tempBuildProp + " /system/build.prop\n");
 	        os.writeBytes("chmod 755 /system/build.prop\n");
@@ -314,7 +276,7 @@ public class MainActivity extends FragmentActivity {
 		try {
 			process = Runtime.getRuntime().exec("su");
 			os = new DataOutputStream(process.getOutputStream());
-			os.writeBytes("mount -o remount,rw -t yaffs2 /dev/block/mtdblock0 /system\n");
+			os.writeBytes("mount -o rw,remount /system\n");
 			os.writeBytes("busybox cp -f " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/build.prop.bak" + " /system/build.prop\n");
 			os.writeBytes("chmod 755 /system/build.prop\n");
 			os.writeBytes("exit\n");
@@ -325,35 +287,4 @@ public class MainActivity extends FragmentActivity {
 			showToast("Error : " + e);
 		}	
 	}
-	
-	public void partenerApps(View v){
-		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.omerjerk.cheatbox"));
- 	    startActivity(browserIntent);
-	}
-	
-	@Override
-	public void onStart(){
-		super.onStart();
-		AdBuddiz.getInstance().onStart(this);
-	}
-	
-	@Override
-	public void onBackPressed(){
-		AdBuddiz.getInstance().showAd();
-		super.onBackPressed();
-	}
-	
-	@Override
-    public void onDestroy() {
-        if (adView != null) {
-            adView.destroy();
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        clicked = true;
-    }
 }

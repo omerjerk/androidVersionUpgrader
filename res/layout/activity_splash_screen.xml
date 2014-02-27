@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SplashScreen" >
+
+    <LinearLayout android:id="@+id/adLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            
+            android:orientation="horizontal"
+            android:background="@color/red" /> 
+            
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Click the button to continue"
+        android:layout_below="@id/adLayout"
+        android:layout_marginTop="20dp"
+        android:onClick="start" />
+
+</RelativeLayout>
